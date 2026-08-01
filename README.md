@@ -1,262 +1,164 @@
-<div align="center">
-
-# MovieBox-TUI
-
-**Stream movies, shows, anime, and live TV from your terminal.** <br>
-Fast and clean. No configuration, no torrents, and no debrid required.
-
-[![Crates.io](https://img.shields.io/crates/v/moviebox-tui.svg?logo=rust)](https://crates.io/crates/moviebox-tui)
-[![Downloads](https://img.shields.io/crates/d/moviebox-tui.svg)](https://crates.io/crates/moviebox-tui)
-[![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
-[![Rust](https://img.shields.io/badge/rust-1.85%2B-orange.svg?logo=rust)](#requirements)
-
-<br>
-
-<img src="https://raw.githubusercontent.com/mesamirh/MovieBox-Tui/main/assets/screenshots/01-home-blocky.jpg" alt="MovieBox-TUI Home" width="85%">
-
-**[See what's new in v0.1.7 on YouTube](https://youtu.be/5M2_mjH5r5Y)**
-
-<sub>Found a bug? [Open an issue](https://github.com/mesamirh/MovieBox-Tui/issues) so I can fix it for everyone!</sub>
-
-</div>
-
-
-## Screenshots
-
-<details>
-<summary><b>Movie & Series Details</b></summary><br>
 <p align="center">
-  <img src="https://raw.githubusercontent.com/mesamirh/MovieBox-Tui/main/assets/screenshots/07-movie-details.jpg" alt="Movie Details" width="49%">
-  <img src="https://raw.githubusercontent.com/mesamirh/MovieBox-Tui/main/assets/screenshots/08-series-details.jpg" alt="Series Details" width="49%">
+  <img src="https://img.shields.io/badge/FastAPI-0.115-009688" alt="FastAPI">
+  <img src="https://img.shields.io/badge/Python-3.11%2B-3776AB" alt="Python 3.11+">
+  <img src="https://img.shields.io/badge/License-MIT-yellow" alt="License">
 </p>
-</details>
 
-<details>
-<summary><b>Search & Downloads</b></summary><br>
+<h1 align="center">Unified API</h1>
+
 <p align="center">
-  <img src="https://raw.githubusercontent.com/mesamirh/MovieBox-Tui/main/assets/screenshots/06-search-results.jpg" alt="Search Results" width="49%">
-  <img src="https://raw.githubusercontent.com/mesamirh/MovieBox-Tui/main/assets/screenshots/12-download-progress.jpg" alt="Download Progress" width="49%">
+  One normalized REST API that powers every data source of
+  <a href="https://github.com/mesamirh/MovieBox-Tui">MovieBox-TUI</a>:
+  <b>movies, series, subtitles, live TV, and update feeds</b> — behind a single,
+  documented, deploy-ready FastAPI service.
 </p>
-</details>
 
-<details>
-<summary><b>Playback & Subtitles</b></summary><br>
-<p align="center">
-  <img src="https://raw.githubusercontent.com/mesamirh/MovieBox-Tui/main/assets/screenshots/11-player-picker.jpg" alt="Media Player Selection" width="49%">
-  <img src="https://raw.githubusercontent.com/mesamirh/MovieBox-Tui/main/assets/screenshots/10-playback-subtitles.jpg" alt="Subtitle Language Selection" width="49%">
-</p>
-</details>
+## Why?
 
-<details>
-<summary><b>Live TV Experience</b></summary><br>
-<p align="center">
-  <img src="https://raw.githubusercontent.com/mesamirh/MovieBox-Tui/main/assets/screenshots/09-live-tv-list.jpg" alt="Live TV Channels" width="49%">
-  <img src="https://raw.githubusercontent.com/mesamirh/MovieBox-Tui/main/assets/screenshots/05-tv-help.jpg" alt="Live TV Configuration" width="49%">
-</p>
-</details>
+MovieBox-TUI talks to four very different backends: a **signed private BFF
+API** (MovieBox/OneRoom), an **HTML scraped catalog** (4KHDHub), **M3U live-TV
+feeds** (IPTV-org), and the **GitHub API**. Each has its own auth scheme, data
+shape, and failure modes.
 
-<details>
-<summary><b>Home Themes</b></summary><br>
-<p align="center">
-  <img src="https://raw.githubusercontent.com/mesamirh/MovieBox-Tui/main/assets/screenshots/03-home-3d.jpg" alt="3D Block Theme" width="49%">
-  <img src="https://raw.githubusercontent.com/mesamirh/MovieBox-Tui/main/assets/screenshots/02-home-ascii.jpg" alt="Minimal ASCII Theme" width="49%">
-</p>
-</details>
+This project wraps all four into one consistent API so a single client
+implementation can power an entire app — search, browse, details, playback,
+subtitles, and live TV — without touching any provider internals.
 
-<details>
-<summary><b>Help & Configuration</b></summary><br>
-<p align="center">
-  <img src="https://raw.githubusercontent.com/mesamirh/MovieBox-Tui/main/assets/screenshots/04-global-help.jpg" alt="Global Help Menu" width="85%">
-</p>
-</details>
+| Provider | Auth / technique | Exposed by |
+| --- | --- | --- |
+| MovieBox | HMAC-MD5 signed requests + session token | Search, tabs, details, streams, subtitles, play |
+| 4KHDHub | HTML scraping + mirror resolution chain | Search, details, releases, play |
+| IPTV-org | Public M3U / JSON feeds (24h cache) | Categories, languages, countries, channels |
+| GitHub | Public releases API | Update metadata + latest version |
 
-
-## Features
-
-### Streaming & Playback
-- **Instant Search & Catalogs:** Type to search instantly, or browse trending movies, shows, and anime using slash commands (e.g., `/movies`, `/anime`).
-- **Seamless Local Playback:** Resolves 4K/1080p streams and opens them instantly in your preferred local video player (`mpv`, `IINA`, or `VLC`).
-- **Integrated Subtitles:** Automatically fetches available subtitles and lets you select your preferred language before playback.
-- **Live IPTV:** Press `Ctrl+T` to toggle Live TV mode and stream thousands of live television channels globally.
-
-### Advanced Downloading
-- **Batch Season Downloader:** Queue up entire television seasons for concurrent downloading with a single keystroke.
-- **Resilient Downloads:** Built-in support for download resumes. If a download is interrupted or fails, it picks up right where it left off.
-- **Auto-Subtitle Fetching:** Automatically downloads the best-matching `.srt` subtitle files alongside your video files.
-
-### Terminal Experience
-- **Native Image Rendering:** Enjoy high-resolution movie posters rendered directly in supported terminals.
-- **Dynamic Theming:** Switch between beautiful 3D block layouts and clean ASCII themes to fit your aesthetic.
-- **Power-User Slash Commands:** Use terminal-style commands to update the app (`/update`), switch categories, or customize your Live TV playlists (`/config`).
-- **Smart Auto-Cleanup:** A silent background worker intelligently manages and deletes old cache files to protect your disk space.
-
-
-## Installation
-
-**Prerequisites:** You will need a terminal (at least 85×24 characters) and a local video player installed (e.g. `mpv`, `IINA`, or `VLC`).
-
-The easiest way to get started is by using our quick install scripts. These scripts will automatically download the correct version for your computer.
-
-### Homebrew (macOS & Linux)
-```bash
-brew tap mesamirh/moviebox-tui https://github.com/mesamirh/MovieBox-Tui
-brew install moviebox-tui
-```
-
-### Install Script (macOS & Linux)
-```bash
-curl -fsSL https://raw.githubusercontent.com/mesamirh/MovieBox-Tui/main/install.sh | bash
-```
-
-### Windows
-```powershell
-powershell -c "irm https://raw.githubusercontent.com/mesamirh/MovieBox-Tui/main/install.ps1 | iex"
-```
-
-### Cargo (For Rust Developers)
-```bash
-cargo install moviebox-tui
-```
-
-<details>
-<summary><i>Need to uninstall?</i></summary>
-
-- **Homebrew:** `brew uninstall moviebox-tui && brew untap mesamirh/moviebox-tui`
-- **Mac/Linux:** `sudo rm -f /usr/local/bin/moviebox-tui`
-- **Windows:** `Remove-Item -Recurse -Force $env:USERPROFILE\AppData\Local\MovieBox-Tui`
-- **Cargo:** `cargo uninstall moviebox-tui`
-</details>
-
-
-
-## Getting Started
-
-Once installed, just open your terminal and type `moviebox-tui` to jump in!
-
-### Keyboard Controls
-
-<table>
-  <tr>
-    <th align="left">Key</th>
-    <th align="left">Action</th>
-  </tr>
-  <tr>
-    <td>Alphanumeric</td>
-    <td>Start searching instantly</td>
-  </tr>
-  <tr>
-    <td><kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd></td>
-    <td>Navigate menus and grids</td>
-  </tr>
-  <tr>
-    <td><kbd>Enter</kbd></td>
-    <td>View details, pick episodes, or play video</td>
-  </tr>
-  <tr>
-    <td><kbd>o</kbd></td>
-    <td>Switch to a different video player on playback</td>
-  </tr>
-  <tr>
-    <td><kbd>d</kbd></td>
-    <td>Download an episode or an entire season</td>
-  </tr>
-  <tr>
-    <td><kbd>Ctrl</kbd>+<kbd>p</kbd></td>
-    <td>Switch between different content providers / sources</td>
-  </tr>
-  <tr>
-    <td><kbd>Ctrl</kbd>+<kbd>t</kbd></td>
-    <td>Toggle Live TV mode to browse IPTV channels</td>
-  </tr>
-  <tr>
-    <td><kbd>?</kbd></td>
-    <td>Open the global help menu</td>
-  </tr>
-  <tr>
-    <td><kbd>q</kbd></td>
-    <td>Quit (or use <kbd>Esc</kbd> to go back/clear search)</td>
-  </tr>
-</table>
-
-### Slash Commands
-You can type these special commands straight into the search bar:
-
-<table>
-  <tr>
-    <th align="left">Command</th>
-    <th align="left">Category</th>
-    <th align="left">Description</th>
-  </tr>
-  <tr>
-    <td><code>/discover</code> or <code>/home</code></td>
-    <td>Streaming</td>
-    <td>See what's trending right now</td>
-  </tr>
-  <tr>
-    <td><code>/movies</code>, <code>/shows</code>, <code>/anime</code></td>
-    <td>Streaming</td>
-    <td>Jump straight to a specific category</td>
-  </tr>
-  <tr>
-    <td><code>/list</code></td>
-    <td>Live TV</td>
-    <td>Show the list of available live channels</td>
-  </tr>
-  <tr>
-    <td><code>/config</code></td>
-    <td>Live TV</td>
-    <td>Open the TV configuration menu to add your own m3u playlists</td>
-  </tr>
-  <tr>
-    <td><code>/update</code></td>
-    <td>General</td>
-    <td>Check to see if there's a new version of the app</td>
-  </tr>
-  <tr>
-    <td><code>/toggle-update</code></td>
-    <td>General</td>
-    <td>Turn automatic background update checking on or off</td>
-  </tr>
-</table>
-
-
-## Contributing
-
-I'd love your help making this even better! If you've got a big feature in mind, it's usually best to open an issue first so we can chat about it.
+## Quick start
 
 ```bash
-git clone https://github.com/mesamirh/MovieBox-Tui.git
-cd MovieBox-Tui
-cargo build
+# 1. Create the environment (uv or pip)
+uv venv .venv
+uv pip install --python .venv/bin/python -r requirements.txt
+# or: python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+
+# 2. Run the server
+.venv/bin/python -m uvicorn app.main:app --port 8000
+
+# 3. Open the docs
+open http://localhost:8000/docs
 ```
 
-Just try to follow [Conventional Commits](https://www.conventionalcommits.org/) and make sure `cargo fmt` and `cargo clippy` are happy before you open a PR. You can check out [CONTRIBUTING.md](CONTRIBUTING.md) for the full rundown.
+Everything is self-contained — no databases, no external services required.
+The MovieBox session token is bootstrapped automatically on first request.
 
+## Documentation
 
-## Credits & Legal
+Interactive, always up-to-date docs are served by the app itself:
 
-Live TV channel playlists are graciously provided by [iptv-org/iptv](https://github.com/iptv-org/iptv).
+- **Swagger UI** — `http://localhost:8000/docs` (try every endpoint live)
+- **ReDoc** — `http://localhost:8000/redoc`
+- **OpenAPI JSON** — `http://localhost:8000/openapi.json`
 
-> **Disclaimer:** This is a third-party client. It does not host or store any media and only resolves links from upstream APIs. Intended for personal use only.
+### Endpoint reference
 
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| `GET` | `/search?q=…&provider=moviebox\|fourkhdhub\|all` | Unified search |
+| `GET` | `/suggest?q=…` | MovieBox typeahead (top 8) |
+| `GET` | `/discover?tab=home\|movies\|shows\|anime` | Browse tabs |
+| `GET` | `/details/{provider}/{id}` | Full metadata + seasons |
+| `GET` | `/streams/{provider}/{id}` | Sources; `?season=&episode=`, `?resolution=` |
+| `GET` | `/play/{provider}/{id}` | Playable URL; `?resolve=true` for 4KHDHub |
+| `GET` | `/subtitles/{id}?resource_id=…` | Subtitle tracks |
+| `GET` | `/tv/categories` `/tv/languages` `/tv/countries` | IPTV option lists |
+| `GET` | `/tv/channels?category=…\|language=…\|country=…\|custom_url=…` | Parsed M3U channels |
+| `GET` | `/updates` `/updates/latest` | GitHub release metadata |
+| `DELETE` | `/cache/{namespace}` | Clear the response cache |
 
-## Community & Support
+### Example
 
-The best way to support MovieBox-TUI is simply to use it, share it, and leave a star on GitHub!
+```bash
+curl "http://localhost:8000/search?q=inception&provider=moviebox"
 
-If you'd like to buy me a coffee for the late nights spent coding, you can use the addresses below.
+# →
+{
+  "query": "inception",
+  "provider": "moviebox",
+  "items": [
+    {
+      "provider": "moviebox",
+      "id": "6391474290696802080",
+      "title": "Inception",
+      "media_type": "movie",
+      "year": "2010-07-16",
+      "poster_url": "https://pbcdn.aoneroom.com/image/…",
+      "imdb_rating": "8.8"
+    }
+  ]
+}
+```
 
-- **EVM:** `0x7ea20d5fa29d87f33195f5a3b211ff94038d794c`
-- **BTC:** `3MEAtqtRWrQBhnaMi3Zuf5nt2efNUS2LUQ`
-- **LTC:** `ltc1qhjkq2n6tsayxj56n3c53uqv23v8vqhvc9g3vxl`
+## Configuration
 
----
+Configuration is done via environment variables:
 
-<div align="center">
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `MOVIEBOX_FOURKHDHUB_URL` | `https://4khdhub.one/` | Override the 4KHDHub base URL |
+| `GITHUB_TOKEN` | — | GitHub API token (avoids rate limits) |
+| `UNIFIED_API_CACHE_DIR` | system temp dir | Where the TTL cache is stored |
 
-Dual-licensed under [MIT](LICENSE-MIT) or [Apache 2.0](LICENSE-APACHE) at your option.<br>
-Built by [**@mesamirh**](https://github.com/mesamirh)
+## Project layout
 
-<sub>Not affiliated with any third-party content providers or operators.</sub>
+```
+.
+├── app/
+│   ├── main.py                  # FastAPI app: routes, tags, docs
+│   ├── models.py                # Normalized Pydantic response models
+│   ├── cache.py                 # TTL file cache
+│   └── providers/
+│       ├── moviebox.py          # Signed BFF client (HMAC-MD5 + session token)
+│       ├── fourkhdhub.py        # Scraper + mirror resolver/preflight chain
+│       ├── iptvorg.py           # IPTV-org feeds + M3U parsing
+│       └── github_releases.py   # GitHub releases proxy
+├── requirements.txt
+└── README.md
+```
 
-</div>
+## Deployment
+
+### Hosting options
+
+| Platform | Python/FastAPI support | Free tier | Notes |
+| --- | --- | --- | --- |
+| **Vercel** | Yes (serverless) | Yes | Best choice for a lightweight public API; cold starts ~1s |
+| **Render** | Yes (full server) | Yes | Full uvicorn process; sleeps after ~15 min idle |
+| **Fly.io** | Yes (full server) | Trial credits | Best for heavy workloads |
+| **Railway** | Yes (full server) | Trial credits | Easy CLI deploys |
+| **Netlify** | **No** | — | Functions are TS/JS/Go only; Python is build-time only — cannot run this |
+
+> **Vercel quick deploy** — the app is compatible with Vercel's Python
+> runtime as-is. Link the repo in the dashboard, set the framework to
+> *Other* → *Python*, and the `app.main:app` entrypoint is detected
+> automatically. See [`vercel.json`](vercel.json) for the recommended config.
+
+> **Render quick deploy** — create a *Web Service* from the repo; Render
+> auto-detects the Python env, installs `requirements.txt`, and runs the
+> start command from [`render.yaml`](render.yaml) (`uvicorn app.main:app`).
+
+### Running behind a reverse proxy
+
+The app is stateless and scales horizontally; only the MovieBox session token
+is kept in memory per instance. Put it behind nginx/Caddy or any PaaS load
+balancer and terminate TLS there.
+
+## Troubleshooting
+
+| Symptom | Cause / fix |
+| --- | --- |
+| `502 moviebox: all hosts exhausted` | All MovieBox hosts rejected the request — retry; hosts rotate automatically. If persistent, the signing secret or device fingerprint may have rotated upstream. |
+| `502` from 4KHDHub endpoints | The site is behind Cloudflare; a browser User-Agent is used, but heavy scraping may be challenged. Retry after a moment. |
+| `407 / 441` inside provider logs | The upstream rejected the signature or session token — restart the server to force a fresh bootstrap. |
+| IPTV lists empty | Namespace cache may be stale — `DELETE /cache/iptv-org` then retry. |
+
+## License
+
+MIT — see [LICENSE](LICENSE).
