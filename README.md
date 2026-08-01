@@ -7,25 +7,23 @@
 <h1 align="center">Unified API</h1>
 
 <p align="center">
-  One normalized REST API that powers every data source of
-  <a href="https://github.com/mesamirh/MovieBox-Tui">MovieBox-TUI</a>:
-  <b>movies, series, subtitles, live TV, and update feeds</b> — behind a single,
-  documented, deploy-ready FastAPI service.
+  One normalized REST API for <b>movies, series, subtitles, live TV, and update
+  feeds</b> - behind a single, documented, deploy-ready FastAPI service.
 </p>
 
 ## Why?
 
-MovieBox-TUI talks to four very different backends: a **signed private BFF
-API** (MovieBox/OneRoom), an **HTML scraped catalog** (4KHDHub), **M3U live-TV
-feeds** (IPTV-org), and the **GitHub API**. Each has its own auth scheme, data
-shape, and failure modes.
+This API talks to four very different backends: a **signed private BFF
+API**, an **HTML scraped catalog** (4KHDHub), **M3U live-TV feeds**
+(IPTV-org), and the **GitHub API**. Each has its own auth scheme, data shape,
+and failure modes.
 
 This project wraps all four into one consistent API so a single client
-implementation can power an entire app — search, browse, details, playback,
-subtitles, and live TV — without touching any provider internals.
+implementation can power an entire app - search, browse, details, playback,
+subtitles, and live TV - without touching any provider internals.
 
 | Provider | Auth / technique | Exposed by |
-| --- | --- | --- |
+| - | - | - |
 | MovieBox | HMAC-MD5 signed requests + session token | Search, tabs, details, streams, subtitles, play |
 | 4KHDHub | HTML scraping + mirror resolution chain | Search, details, releases, play |
 | IPTV-org | Public M3U / JSON feeds (24h cache) | Categories, languages, countries, channels |
@@ -46,23 +44,23 @@ uv pip install --python .venv/bin/python -r requirements.txt
 open http://localhost:8000/docs
 ```
 
-Everything is self-contained — no databases, no external services required.
-The MovieBox session token is bootstrapped automatically on first request.
+Everything is self-contained - no databases, no external services required.
+The session token is bootstrapped automatically on first request.
 
 ## Documentation
 
 Interactive, always up-to-date docs are served by the app itself:
 
-- **Swagger UI** — `http://localhost:8000/docs` (try every endpoint live)
-- **ReDoc** — `http://localhost:8000/redoc`
-- **OpenAPI JSON** — `http://localhost:8000/openapi.json`
+- **Swagger UI** - `http://localhost:8000/docs` (try every endpoint live)
+- **ReDoc** - `http://localhost:8000/redoc`
+- **OpenAPI JSON** - `http://localhost:8000/openapi.json`
 
 ### Endpoint reference
 
 | Method | Endpoint | Description |
-| --- | --- | --- |
+| - | - | - |
 | `GET` | `/search?q=…&provider=moviebox\|fourkhdhub\|all` | Unified search |
-| `GET` | `/suggest?q=…` | MovieBox typeahead (top 8) |
+| `GET` | `/suggest?q=…` | Typeahead suggestions (top 8) |
 | `GET` | `/discover?tab=home\|movies\|shows\|anime` | Browse tabs |
 | `GET` | `/details/{provider}/{id}` | Full metadata + seasons |
 | `GET` | `/streams/{provider}/{id}` | Sources; `?season=&episode=`, `?resolution=` |
@@ -101,9 +99,9 @@ curl "http://localhost:8000/search?q=inception&provider=moviebox"
 Configuration is done via environment variables:
 
 | Variable | Default | Purpose |
-| --- | --- | --- |
+| - | - | - |
 | `MOVIEBOX_FOURKHDHUB_URL` | `https://4khdhub.one/` | Override the 4KHDHub base URL |
-| `GITHUB_TOKEN` | — | GitHub API token (avoids rate limits) |
+| `GITHUB_TOKEN` | - | GitHub API token (avoids rate limits) |
 | `UNIFIED_API_CACHE_DIR` | system temp dir | Where the TTL cache is stored |
 
 ## Project layout
@@ -125,40 +123,30 @@ Configuration is done via environment variables:
 
 ## Deployment
 
-### Hosting options
+### Deploy on Vercel
 
-| Platform | Python/FastAPI support | Free tier | Notes |
-| --- | --- | --- | --- |
-| **Vercel** | Yes (serverless) | Yes | Best choice for a lightweight public API; cold starts ~1s |
-| **Render** | Yes (full server) | Yes | Full uvicorn process; sleeps after ~15 min idle |
-| **Fly.io** | Yes (full server) | Trial credits | Best for heavy workloads |
-| **Railway** | Yes (full server) | Trial credits | Easy CLI deploys |
-| **Netlify** | **No** | — | Functions are TS/JS/Go only; Python is build-time only — cannot run this |
+The app is compatible with Vercel's Python runtime as-is. Link the repo in
+the Vercel dashboard, set the framework to *Other* - *Python*, and the
+`app.main:app` entrypoint is detected automatically. See
+[`vercel.json`](vercel.json) for the recommended config.
 
-> **Vercel quick deploy** — the app is compatible with Vercel's Python
-> runtime as-is. Link the repo in the dashboard, set the framework to
-> *Other* → *Python*, and the `app.main:app` entrypoint is detected
-> automatically. See [`vercel.json`](vercel.json) for the recommended config.
-
-> **Render quick deploy** — create a *Web Service* from the repo; Render
-> auto-detects the Python env, installs `requirements.txt`, and runs the
-> start command from [`render.yaml`](render.yaml) (`uvicorn app.main:app`).
-
-### Running behind a reverse proxy
-
-The app is stateless and scales horizontally; only the MovieBox session token
-is kept in memory per instance. Put it behind nginx/Caddy or any PaaS load
-balancer and terminate TLS there.
+```bash
+# or via the Vercel CLI
+npm i -g vercel
+vercel
+```
 
 ## Troubleshooting
 
 | Symptom | Cause / fix |
-| --- | --- |
-| `502 moviebox: all hosts exhausted` | All MovieBox hosts rejected the request — retry; hosts rotate automatically. If persistent, the signing secret or device fingerprint may have rotated upstream. |
+| - | - |
+| `502 moviebox: all hosts exhausted` | All MovieBox hosts rejected the request - retry; hosts rotate automatically. If persistent, the signing secret or device fingerprint may have rotated upstream. |
 | `502` from 4KHDHub endpoints | The site is behind Cloudflare; a browser User-Agent is used, but heavy scraping may be challenged. Retry after a moment. |
-| `407 / 441` inside provider logs | The upstream rejected the signature or session token — restart the server to force a fresh bootstrap. |
-| IPTV lists empty | Namespace cache may be stale — `DELETE /cache/iptv-org` then retry. |
+| `407 / 441` inside provider logs | The upstream rejected the signature or session token - restart the server to force a fresh bootstrap. |
+| IPTV lists empty | Namespace cache may be stale - `DELETE /cache/iptv-org` then retry. |
 
-## License
+## Acknowledgments
 
-MIT — see [LICENSE](LICENSE).
+This project is based on the
+[MovieBox TUI](https://github.com/mesamirh/MovieBox-Tui) project - the
+provider APIs, signing logic, and data flows are taken from that project.
