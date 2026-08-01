@@ -1,7 +1,3 @@
 {
-  "functions": {
-    "api/vercel_app.py": {
-      "runtime": "python3.12"
-    }
-  }
+  "framework": null
 }

@@ -1,8 +1,7 @@
 """Vercel serverless entrypoint.
 
-Vercel's Python runtime scans modules in `api/` for a WSGI/ASGI application
-object. This module exposes the FastAPI app so every route is served as a
-single serverless function (see `vercel.json`).
+Vercel's Python runtime auto-detects ASGI/WSGI applications exposed as `app`
+from modules in `api/`. Every route is served as a single serverless function.
 """
 from __future__ import annotations
 
