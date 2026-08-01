@@ -154,7 +154,9 @@ balancer and terminate TLS there.
 
 | Symptom | Cause / fix |
 | --- | --- |
+| `502 moviebox: all hosts exhausted` | All MovieBox hosts rejected the request — retry; hosts rotate automatically. If persistent, the signing secret or device fingerprint may have rotated upstream. |
 | `502` from 4KHDHub endpoints | The site is behind Cloudflare; a browser User-Agent is used, but heavy scraping may be challenged. Retry after a moment. |
+| `407 / 441` inside provider logs | The upstream rejected the signature or session token — restart the server to force a fresh bootstrap. |
 | IPTV lists empty | Namespace cache may be stale — `DELETE /cache/iptv-org` then retry. |
 
 ## License
