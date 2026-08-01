@@ -13,12 +13,11 @@
 
 ## Why?
 
-This API talks to four very different backends: a **signed private BFF
-API**, an **HTML scraped catalog** (4KHDHub), **M3U live-TV feeds**
-(IPTV-org), and the **GitHub API**. Each has its own auth scheme, data shape,
-and failure modes.
+This API talks to three very different backends: a **signed private BFF
+API**, an **HTML scraped catalog** (4KHDHub), and **M3U live-TV feeds**
+(IPTV-org). Each has its own auth scheme, data shape, and failure modes.
 
-This project wraps all four into one consistent API so a single client
+This project wraps them all into one consistent API so a single client
 implementation can power an entire app - search, browse, details, playback,
 subtitles, and live TV - without touching any provider internals.
 
@@ -27,7 +26,6 @@ subtitles, and live TV - without touching any provider internals.
 | MovieBox | HMAC-MD5 signed requests + session token | Search, tabs, details, streams, subtitles, play |
 | 4KHDHub | HTML scraping + mirror resolution chain | Search, details, releases, play |
 | IPTV-org | Public M3U / JSON feeds (24h cache) | Categories, languages, countries, channels |
-| GitHub | Public releases API | Update metadata + latest version |
 
 ## Quick start
 
@@ -68,7 +66,6 @@ Interactive, always up-to-date docs are served by the app itself:
 | `GET` | `/subtitles/{id}?resource_id=…` | Subtitle tracks |
 | `GET` | `/tv/categories` `/tv/languages` `/tv/countries` | IPTV option lists |
 | `GET` | `/tv/channels?category=…\|language=…\|country=…\|custom_url=…` | Parsed M3U channels |
-| `GET` | `/updates` `/updates/latest` | GitHub release metadata |
 | `DELETE` | `/cache/{namespace}` | Clear the response cache |
 
 ### Example
@@ -101,7 +98,6 @@ Configuration is done via environment variables:
 | Variable | Default | Purpose |
 | - | - | - |
 | `MOVIEBOX_FOURKHDHUB_URL` | `https://4khdhub.one/` | Override the 4KHDHub base URL |
-| `GITHUB_TOKEN` | - | GitHub API token (avoids rate limits) |
 | `UNIFIED_API_CACHE_DIR` | system temp dir | Where the TTL cache is stored |
 
 ## Project layout
@@ -116,7 +112,6 @@ Configuration is done via environment variables:
 │       ├── moviebox.py          # Signed BFF client (HMAC-MD5 + session token)
 │       ├── fourkhdhub.py        # Scraper + mirror resolver/preflight chain
 │       ├── iptvorg.py           # IPTV-org feeds + M3U parsing
-│       └── github_releases.py   # GitHub releases proxy
 ├── requirements.txt
 └── README.md
 ```

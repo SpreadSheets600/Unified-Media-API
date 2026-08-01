@@ -24,7 +24,7 @@ from .models import (
     StreamsResponse,
     SubtitleTrack,
 )
-from .providers import fourkhdhub, github_releases, iptvorg
+from .providers import fourkhdhub, iptvorg
 from .providers.moviebox import MovieBoxClient, MovieBoxError
 
 app = FastAPI(
@@ -32,8 +32,8 @@ app = FastAPI(
     summary="One normalized REST API for every MovieBox-TUI data source.",
     description=(
         "Unified proxy for every source used by MovieBox-TUI: the signed "
-        "MovieBox (OneRoom) BFF API, the 4KHDHub scraper, IPTV-org live-TV "
-        "feeds, and GitHub release metadata.\n\n"
+        "MovieBox (OneRoom) BFF API, the 4KHDHub scraper, and IPTV-org "
+        "live-TV feeds.\n\n"
         "All responses are normalized into the models in `app/models.py`, so a "
         "single client implementation can drive the whole app. Browse the "
         "endpoints below — every one can be executed interactively."
@@ -59,10 +59,6 @@ app = FastAPI(
         {
             "name": "Live TV",
             "description": "IPTV-org categories, languages, countries, and channels.",
-        },
-        {
-            "name": "Updates",
-            "description": "MovieBox-TUI GitHub release metadata.",
         },
     ],
 )
@@ -90,7 +86,7 @@ def root():
     return {
         "name": "Unified API",
         "version": app.version,
-        "providers": ["moviebox", "fourkhdhub", "iptv-org", "github"],
+        "providers": ["moviebox", "fourkhdhub", "iptv-org"],
         "docs": "/docs",
         "redoc": "/redoc",
         "openapi": "/openapi.json",
@@ -400,40 +396,6 @@ async def tv_channels(
 
 
 # ---------------------------------------------------------------------------
-# Updates: GitHub releases
-# ---------------------------------------------------------------------------
-@app.get(
-    "/updates/latest",
-    tags=["Updates"],
-    summary="Latest release version",
-)
-async def updates_latest():
-    """The newest MovieBox-TUI release tag."""
-    try:
-        version = await github_releases.latest_version()
-    except Exception as exc:  # noqa: BLE001
-        raise HTTPException(status_code=502, detail=str(exc))
-    return {"repository": "mesamirh/MovieBox-Tui", "latest_version": version}
-
-
-@app.get(
-    "/updates",
-    tags=["Updates"],
-    summary="Recent releases",
-)
-async def updates():
-    """The 20 most recent MovieBox-TUI releases."""
-    try:
-        releases = await github_releases.latest_releases()
-    except Exception as exc:  # noqa: BLE001
-        raise HTTPException(status_code=502, detail=str(exc))
-    return [
-        {"tag_name": r.get("tag_name"), "name": r.get("name"), "published_at": r.get("published_at")}
-        for r in releases
-    ]
-
-
-# ---------------------------------------------------------------------------
 # Cache management
 # ---------------------------------------------------------------------------
 @app.delete(
@@ -444,7 +406,7 @@ async def updates():
 async def clear_cache(namespace: Optional[str] = None):
     """Clear all cached responses, or only those for a namespace.
 
-    Namespaces: `fourkhdhub`, `iptv-org`, `github` (and the MovieBox session).
+    Namespaces: `fourkhdhub`, `iptv-org` (and the MovieBox session).
     """
     cache.clear(namespace)
     return {"cleared": namespace or "all"}
